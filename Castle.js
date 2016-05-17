@@ -16,6 +16,7 @@
             "current": null
         };
 
+
         // Background
         this.sky = {
             "frame": {
@@ -29,8 +30,9 @@
                 "dh": 190
             },
             "speed": 3,
-            "maxOffset": 336 - game.app.width,
+            "maxOffset": 508 - game.app.width,
             "draw": function() {
+
                 game._drawBackgrSpriteFromFrame( this.frame );
             },
             "update": function() {
@@ -53,8 +55,9 @@
                 "dh": 190
             },
             "speed": 3,
-            "maxOffset": 336 - game.app.width,
+            "maxOffset": 500 - game.app.width,
             "draw": function() {
+                game._drawBackgrSpriteFromFrame( this.frame );
                 game._drawBackgrSpriteFromFrame( this.frame );
             },
             "update": function() {
@@ -132,19 +135,23 @@
                     "dh": 190
                 }
             },
-            // "speed": 2,
-            // "maxOffset": 336 - game.app.width,
+            "speed": 2,
+            "maxOffset": 504- game.app.width,
             "draw": function() {
                 game._drawBackgrSpriteFromFrame( this.frames.part1 );
                 game._drawBackgrSpriteFromFrame( this.frames.part2 );
                 game._drawBackgrSpriteFromFrame( this.frames.part3 );
                 game._drawBackgrSpriteFromFrame( this.frames.part4 );
+                game._drawBackgrSpriteFromFrame( this.frames.part1, 504,108 );
+                game._drawBackgrSpriteFromFrame( this.frames.part2, 504,108 );
+                game._drawBackgrSpriteFromFrame( this.frames.part3, 504,108 );
+                game._drawBackgrSpriteFromFrame( this.frames.part4, 504,108 );
             },
             "update": function() {
-                // if ( this.frame.dx <= ( this.maxOffset * -1 ) ) {
-                //     this.frame.dx = 0;
-                // }
-                // this.frame.dx -= this.speed;
+                if ( this.frames.dx <= ( this.maxOffset * -1 ) ) {
+                    this.frames.dx = 0;
+                }
+                this.frame.dx -= this.speed;
                 this.draw();
             }
         };
