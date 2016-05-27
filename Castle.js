@@ -1,13 +1,60 @@
 ( function() {
     "use strict";
 
-    var Castle;
+    var Castle,
+        direction = 1, // 1 = right, 2 = left
+        movingL = false,
+        movingR = false,
+        jump = false;
+
+    // keyboard Manager
+    function doKeyDown(evt){
+        switch (evt.keyCode) {
+            // case 38:  /* Up arrow was pressed */
+            //     jump = true;
+            //     break;
+            case 40:  /* Down arrow was pressed */
+
+                break;
+            case 37:  /* Left arrow was pressed */
+                movingL=true;
+                direction = 2;
+                break;
+            case 39:  /* Right arrow was pressed */
+                movingR=true;
+                direction = 1;
+                break;
+            case 32: /* space was pressed */
+
+                break;
+            }
+
+    }
+    function doKeyUp(evt){
+        switch (evt.keyCode) {
+            case 40:  /* Down arrow was pressed */
+
+                break;
+            case 37:  /* Left arrow was released */
+                movingL=false;
+                break;
+            case 39:  /* Right arrow was released */
+                movingR=false;
+                break;
+            case 32: /* space was pressed */
+
+                break;
+            }
+    }
 
     // background Manager
 
     Castle = function( oApp ) {
 
         var game = this; // eslint-disable-line consistent-this
+        //Assign audio to soundEfx
+        var soundEfx = document.getElementById("soundEfx");
+        var soundLoad = "resources/sounds/GameOver.mp3"; //Game Over sound efx
 
         this.app = oApp;
 
@@ -16,196 +63,199 @@
             "current": null
         };
 
-
         // Background
         this.sky = {
             "frame": {
-                "sx": 7,
+                "sx": 8,
                 "sy": 207,
-                "sw": 254,
-                "sh": 190,
-                "dx": 0,
+                "sw": 2036,
+                "sh": 192,
+                "dx": -1018+game.app.width,
                 "dy": 0,
-                "dw": 254,
-                "dh": 190
+                "dw": 2036,
+                "dh": 192
             },
-            "speed": 3,
-            "maxOffset": 508 - game.app.width,
+            "speed": 0.1,
+            "maxOffset": 2036 - game.app.width,
             "draw": function() {
-
                 game._drawBackgrSpriteFromFrame( this.frame );
             },
             "update": function() {
                 if ( this.frame.dx <= ( this.maxOffset * -1 ) ) {
-                    this.frame.dx = 0;
+                    this.frame.dx = -1018+game.app.width;
                 }
                 this.frame.dx -= this.speed;
                 this.draw();
-            }
-        };
-        this.sky = {
-            "frame": {
-                "sx": 7,
-                "sy": 207,
-                "sw": 254,
-                "sh": 190,
-                "dx": 0,
-                "dy": 0,
-                "dw": 254,
-                "dh": 190
             },
-            "speed": 3,
-            "maxOffset": 500 - game.app.width,
-            "draw": function() {
-                game._drawBackgrSpriteFromFrame( this.frame );
-                game._drawBackgrSpriteFromFrame( this.frame );
-            },
-            "update": function() {
-                if ( this.frame.dx <= ( this.maxOffset * -1 ) ) {
-                    this.frame.dx = 0;
+            "updateL": function() {
+                if ( this.frame.dx >= 0 ) {
+                    this.frame.dx = -1018+game.app.width;
                 }
-                this.frame.dx -= this.speed;
+                this.frame.dx += this.speed;
                 this.draw();
             }
         };
         this.city = {
             "frame": {
-                "sx": 566,
-                "sy": 133,
-                "sw": 125,
-                "sh": 60,
-                "dx": 0,
-                "dy": 145,
-                "dw": 125,
-                "dh": 60
+                "sx": 8,
+                "sy": 428,
+                "sw": 2020,
+                "sh": 61,
+                "dx": -1010+game.app.width,
+                "dy": 149,
+                "dw": 2020,
+                "dh": 61
             },
-            "speed": 3,
-            "maxOffset": 336 - game.app.width,
+            "speed": 0.3,
+            "maxOffset": 2020 - game.app.width,
             "draw": function() {
                 game._drawBackgrSpriteFromFrame( this.frame );
             },
             "update": function() {
                 if ( this.frame.dx <= ( this.maxOffset * -1 ) ) {
-                    this.frame.dx = 0;
+                    this.frame.dx = -1010+game.app.width;
                 }
                 this.frame.dx -= this.speed;
+                this.draw();
+            },
+            "updateL": function() {
+                if ( this.frame.dx >= 0 ) {
+                    this.frame.dx = -1010+game.app.width;
+                }
+                this.frame.dx += this.speed;
                 this.draw();
             }
         };
         this.building = {
-            "frames": {
-                "part1":{
-                    "sx": 7,
-                    "sy": 6,
-                    "sw": 126,
-                    "sh": 190,
-                    "dx": 0,
-                    "dy": 108,
-                    "dw": 126,
-                    "dh": 190
-                },
-                "part2":{
-                    "sx": 142,
-                    "sy": 6,
-                    "sw": 126,
-                    "sh": 190,
-                    "dx": 126,
-                    "dy": 108,
-                    "dw": 126,
-                    "dh": 190
-                },
-                "part3":{
-                    "sx": 280,
-                    "sy": 6,
-                    "sw": 126,
-                    "sh": 190,
-                    "dx": 252,
-                    "dy": 108,
-                    "dw": 126,
-                    "dh": 190
-                },
-                "part4":{
-                    "sx": 417,
-                    "sy": 6,
-                    "sw": 126,
-                    "sh": 190,
-                    "dx": 378,
-                    "dy": 108,
-                    "dw": 126,
-                    "dh": 190
-                }
+            "frame": {
+                "sx": 8,
+                "sy": 6,
+                "sw": 2020,
+                "sh": 192,
+                "dx": -1010+game.app.width,
+                "dy": 108,
+                "dw": 2020,
+                "dh": 192
             },
-            "speed": 2,
-            "maxOffset": 504- game.app.width,
+            "speed": 1.2,
+            "maxOffset": 2020- game.app.width,
             "draw": function() {
-                game._drawBackgrSpriteFromFrame( this.frames.part1 );
-                game._drawBackgrSpriteFromFrame( this.frames.part2 );
-                game._drawBackgrSpriteFromFrame( this.frames.part3 );
-                game._drawBackgrSpriteFromFrame( this.frames.part4 );
-                game._drawBackgrSpriteFromFrame( this.frames.part1, 504,108 );
-                game._drawBackgrSpriteFromFrame( this.frames.part2, 504,108 );
-                game._drawBackgrSpriteFromFrame( this.frames.part3, 504,108 );
-                game._drawBackgrSpriteFromFrame( this.frames.part4, 504,108 );
+                game._drawBackgrSpriteFromFrame( this.frame );
+
             },
             "update": function() {
-                if ( this.frames.dx <= ( this.maxOffset * -1 ) ) {
-                    this.frames.dx = 0;
+                if ( this.frame.dx <= ( this.maxOffset * -1 ) ) {
+                    this.frame.dx = -1010+game.app.width;
                 }
                 this.frame.dx -= this.speed;
+                this.draw();
+            },
+            "updateL": function() {
+                if ( this.frame.dx >=0 ) {
+                    this.frame.dx = -1010+game.app.width;
+                }
+                this.frame.dx += this.speed;
                 this.draw();
             }
         };
 
         // Ground
         this.ground = {
-            "frames":{
-                "gr1":{
-                    "sx": 608,
-                    "sy": 77,
-                    "sw": 46,
-                    "sh": 15,
-                    "dx": 0,
-                    "dy": game.app.height - 15,
-                    "dw": 46,
-                    "dh": 15
-                },
-                "gr2":{
-                    "sx": 608,
-                    "sy": 93,
-                    "sw": 46,
-                    "sh": 15,
-                    "dx": 46,
-                    "dy": game.app.height - 15,
-                    "dw": 46,
-                    "dh": 15
-                }
+            "frame":{
+                "sx": 7,
+                "sy": 521,
+                "sw": 2028,
+                "sh": 15,
+                "dx": -1014+game.app.width,
+                "dy": game.app.height - 15,
+                "dw": 2028,
+                "dh": 15
             },
-            // "speed": 3,
-            // "maxOffset": 46 - game.app.width,
+            "speed": 1.2,
+            "maxOffset": 2028 - game.app.width,
             "draw": function() {
-                game._drawBackgrSpriteFromFrame( this.frames.gr1 );
-                game._drawBackgrSpriteFromFrame( this.frames.gr2 );
+                game._drawBackgrSpriteFromFrame( this.frame );
             },
             "update": function() {
-                // if ( this.frames.dx <= ( this.maxOffset * -1 ) ) {
-                //     this.frames.dx = 0;
-                // }
-                // this.frame.dx -= this.speed;
+                if ( this.frame.dx <= ( this.maxOffset * -1 ) ) {
+                    this.frame.dx = -1014+game.app.width;
+                }
+                this.frame.dx -= this.speed;
+                this.draw();
+            },
+            "updateL": function() {
+                if ( this.frame.dx >= 0 ) {
+                    this.frame.dx = -1014+game.app.width;
+                }
+                this.frame.dx += this.speed;
                 this.draw();
             }
         };
 
         // character
+
         this.char = {
-                    "frames": [
+                    "framesIddleR": [
                         {
-                            "sx": 3,
+                            "sx": 143,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 174,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 207,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 239,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        }
+                    ],
+                    "framesIddleL": [
+                        {
+                            "sx": 896,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 864,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 832,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 799,
+                            "sy": 448,
+                            "sw": 26,
+                            "sh": 44
+                        }
+                    ],
+                    "framesR": [
+                        {
+                            "sx": -3,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 33,
+                            "sx": 29,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
@@ -229,77 +279,298 @@
                             "sh": 43
                         },
                         {
-                            "sx": 164,
+                            "sx": 163,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 198,
+                            "sx": 195,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 231,
+                            "sx": 227,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 267,
+                            "sx": 263,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 300,
+                            "sx": 295,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 334,
+                            "sx": 327,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 366,
+                            "sx": 359,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 397,
+                            "sx": 393,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 428,
+                            "sx": 424,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 460,
+                            "sx": 455,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         },
                         {
-                            "sx": 492,
+                            "sx": 487,
                             "sy": 153,
                             "sw": 30,
                             "sh": 43
                         }
                     ],
+                    "framesL":[
+                        {
+                            "sx": 1290,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1258,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1225,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1193,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1155,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1124,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1091,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1060,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 1024,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 992,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 960,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 928,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 895,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 863,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 832,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        },
+                        {
+                            "sx": 799,
+                            "sy": 153,
+                            "sw": 30,
+                            "sh": 43
+                        }
+                    ],
+                    "framesJumpR":[
+                        {
+                            "sx": 139,
+                            "sy": 402,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -36
+                        },                              //quitte le sol
+                        {
+                            "sx": 139,
+                            "sy": 402,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -42
+                        },
+                        {
+                            "sx": 180,
+                            "sy": 402,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -48
+                        },
+                        {
+                            "sx": 260,
+                            "sy": 404,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -54
+                        },
+                        {
+                            "sx": 299,
+                            "sy": 404,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -60
+                        },
+                        {
+                            "sx": 339,
+                            "sy": 404,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -54
+                        },
+                        {
+                            "sx": 380,
+                            "sy": 404,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -42
+                        },
+                        {                           // retouche le sol
+                            "sx": 427,
+                            "sy": 402,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -36
+                        },
+                        {
+                            "sx": 468,
+                            "sy": 402,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -36
+                        },
+                        {
+                            "sx": 508,
+                            "sy": 153,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -36
+                        },
+                        {
+                            "sx": 549,
+                            "sy": 153,
+                            "sw": 37,
+                            "sh": 42,
+                            "dy": game.app.height -36
+                        }
+                    ],
+                    "framesDown":[],
+                    "framesAtk":[
+                        {
+                            "sx": 47,
+                            "sy": 1417,
+                            "sw": 34,
+                            "sh": 44,
+                            "dw": 34
+                        },
+                        {
+                            "sx": 87,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44,
+                            "dw": 45
+                        },
+                        {
+                            "sx": 138,
+                            "sy": 1417,
+                            "sw": 31,
+                            "sh": 44,
+                            "dw": 31
+                        }
+                    ],
                     "init": function() {
                         // (re)setting properties
-                        this.animation = {
-                            "maxSteps": this.frames.length,
-                            "step": 0
+                        this.animationR = {
+                            "maxStepsR": this.framesR.length,
+                            "stepR": 0
+                        };
+                        this.animationIddle = {
+                            "maxStepIddle": this.framesIddleR.length,
+                            "stepIddle": 0
+                        };
+                        this.animationL = {
+                            "maxStepsL": this.framesL.length,
+                            "stepL": 0
+                        };
+                        this.animationUp = {
+                            "maxStepsUp": this.framesJumpR.length,
+                            "stepUp": 0
+                        };
+                        this.animationDown = {
+                            "maxStepsDown": this.framesDown.length,
+                            "stepDown": 0
+                        };
+                        this.animationAtk = {
+                            "maxStepsAtk": this.framesAtk.length,
+                            "stepAtk": 0
                         };
                         this.state = {
                             "isInDangerZone": false,
@@ -307,25 +578,43 @@
                             "acceleration": 0,
                             "boost": 0
                         };
-                        // this.score = {
-                        //     "current": 0,
-                        //     "previous": 0
-                        // };
                         this.position = {
                             "top": 0,
                             "bottom": 0
                         };
-                        this.destinationFrame = {
-                            "dx": 60,
+                        this.destinationFrameR = {
+                            "dx": game.app.width / 2,
                             "dy": game.app.height -36,
                             "dw": 30,
-                            "dh": 43
+                            "dh": 44
+                        };
+                        this.destinationFrameL = {
+                            "dx": game.app.width / 2,
+                            "dy": game.app.height -36,
+                            "dw": 30,
+                            "dh": 44
+                        };
+                        this.destinationFrameIddle = {
+                            "dx": game.app.width / 2,
+                            "dy": game.app.height -36,
+                            "dw": 26,
+                            "dh": 44
+                        };
+                        // this.destinationFrameJump = {
+                        //     "dx": game.app.width / 2,
+                        //     "dw": 37,
+                        //     "dh": 42
+                        // };
+                        this.destinationFrameAtk = {
+                            "dx":game.app.width / 2,
+                            "dy": game.app.height -36,
+                            "dh": 44
                         };
                     },
-                    "draw": function( iStep ) {
+                    "drawR": function( iStep ) {
                         var oContext = game.app.context,
-                            oFrom = this.frames[ iStep ],
-                            oDest = this.destinationFrame;
+                            oFrom = this.framesR[ iStep ],
+                            oDest = this.destinationFrameR;
 
                         oContext.save();
                         oContext.translate( oDest.dx, oDest.dy );
@@ -342,28 +631,123 @@
                         );
                         oContext.restore();
                     },
-                    "update": function( oEvent ) {
-                        var self = this;
+                    "drawL": function( iStep ) {
+                        var oContext = game.app.context,
+                            oFrom = this.framesL[ iStep ],
+                            oDest = this.destinationFrameL;
 
-                        // handle event. we ensure that the sended event is the good one.
-                        if ( oEvent ) {
-                            if ( oEvent.type === "click" || ( oEvent.type === "keyup" && oEvent.keyCode === 32 ) ) {
-                                if ( !game.ended ) {
-                                    if ( !this.state.acceleration ) {
-                                        game.started = true;
+                        oContext.save();
+                        oContext.translate( oDest.dx, oDest.dy );
+                        oContext.drawImage(
+                            game.CharacterSprite,
+                            oFrom.sx,
+                            oFrom.sy,
+                            oFrom.sw,
+                            oFrom.sh,
+                            oDest.dw / 2 * -1,
+                            oDest.dh / 2 * -1,
+                            oDest.dw,
+                            oDest.dh
+                        );
+                        oContext.restore();
+                    },
+                    "drawIddleR":function ( iStep ) {
+                        var oContext = game.app.context,
+                            oFrom = this.framesIddleR[ iStep ],
+                            oDest = this.destinationFrameIddle;
 
-                                    } else {
-                                        this.state.speed = this.state.boost;
-                                    }
-                                } else {
-                                    // restart game
-                                    return game.init();
-                                }
-                            } else {
-                                return;
-                            }
-                        }
+                        oContext.save();
+                        oContext.translate( oDest.dx, oDest.dy );
+                        oContext.drawImage(
+                            game.CharacterSprite,
+                            oFrom.sx,
+                            oFrom.sy,
+                            oFrom.sw,
+                            oFrom.sh,
+                            oDest.dw / 2 * -1,
+                            oDest.dh / 2 * -1,
+                            oDest.dw,
+                            oDest.dh
+                        );
+                        oContext.restore();
+                    },
+                    "drawIddleL":function ( iStep ) {
+                        var oContext = game.app.context,
+                            oFrom = this.framesIddleL[ iStep ],
+                            oDest = this.destinationFrameIddle;
+
+                        oContext.save();
+                        oContext.translate( oDest.dx, oDest.dy );
+                        oContext.drawImage(
+                            game.CharacterSprite,
+                            oFrom.sx,
+                            oFrom.sy,
+                            oFrom.sw,
+                            oFrom.sh,
+                            oDest.dw / 2 * -1,
+                            oDest.dh / 2 * -1,
+                            oDest.dw,
+                            oDest.dh
+                        );
+                        oContext.restore();
+                    },
+                    // "drawJumpR":function ( iStep ) {
+                    //     var oContext = game.app.context,
+                    //         oFrom = this.framesJumpR[ iStep ],
+                    //         oDest = this.destinationFrameJump;
+                    //
+                    //     oContext.save();
+                    //     oContext.translate( oDest.dx, oDest.dy );
+                    //     oContext.drawImage(
+                    //         game.CharacterSprite,
+                    //         oFrom.sx,
+                    //         oFrom.sy,
+                    //         oFrom.sw,
+                    //         oFrom.sh,
+                    //         oDest.dw / 2 * -1,
+                    //         oDest.dh / 2 * -1,
+                    //         oDest.dw,
+                    //         oDest.dh
+                    //     );
+                    //     oContext.restore();
+                    // },
+                    "drawAtk":function ( iStep ) {
+                        var oContext = game.app.context,
+                            oFrom = this.framesAtk[ iStep ],
+                            oDest = this.destinationFrameAtk;
+
+                        oContext.save();
+                        oContext.translate( oDest.dx, oDest.dy );
+                        oContext.drawImage(
+                            game.CharacterSprite,
+                            oFrom.sx,
+                            oFrom.sy,
+                            oFrom.sw,
+                            oFrom.sh,
+                            oDest.dw / 2 * -1,
+                            oDest.dh / 2 * -1,
+                            oDest.dw,
+                            oDest.dh
+                        );
+                        oContext.restore();
                     }
+                    // "update": function( oEvent ) {
+                    //     var self = this;
+                    //
+                    //     // handle event. we ensure that the sended event is the good one.
+                    //     // if ( oEvent ) {
+                    //     //     if ( ( oEvent.type === "keydown" && oEvent.keyCode === 68 ) || ( oEvent.type === "keydown" && oEvent.keyCode === 39 ) ) {
+                    //     //         game.char.animation.movingR=true;
+                    //     //     } else {
+                    //     //         return;
+                    //     //     }
+                    //     // }else if ( ( oEvent.type === "keyup" && oEvent.keyCode === 68 ) || ( oEvent.type === "keyup" && oEvent.keyCode === 39 ) ) {
+                    //     //     game.char.animation.movingR=false;
+                    //     // } else {
+                    //     //     return;
+                    //     // }
+                    //
+                    // }
                 };
 
         // Utils
@@ -395,6 +779,7 @@
             );
         };
 
+
         // Setup Animation loop
         this.animate = function() {
             this.time.current = Date.now();
@@ -402,19 +787,75 @@
 
             // draw: clear
             this.app.context.clearRect( 0, 0, this.app.width, this.app.height );
-            // draw & animate: background
-            this.sky.draw();
-            this.city.draw();
-            this.building.draw();
-            // draw & animate: ground
-            this.ground.update();
-            // draw & animate: character
-            this.char.update();
-            if ( this.time.current - this.time.start > 50 ) {
-                this.time.start = Date.now();
-                ( ++this.char.animation.step < this.char.animation.maxSteps ) || ( this.char.animation.step = 0 );
+            if (movingR===true) {
+                // draw & animate: background
+                this.sky.update();
+                this.city.update();
+                this.building.update();
+                // draw & animate: ground
+                this.ground.update();
+                // draw & animate: character
+                if ( this.time.current - this.time.start > 50 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
+                }
+                this.char.drawR( this.char.animationR.stepR );
             }
-            this.char.draw( this.char.animation.step );
+            if (movingL===true) {
+                // draw & animate: background
+                this.sky.updateL();
+                this.city.updateL();
+                this.building.updateL();
+                // draw & animate: ground
+                this.ground.updateL();
+                // draw & animate: character
+                // this.char.update();
+                if ( this.time.current - this.time.start > 50 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
+                }
+                this.char.drawL( this.char.animationL.stepL );
+            }
+            if(direction===2 && (movingL===false && movingR===false && jump === false)){
+                // draw: background
+                this.sky.draw();
+                this.city.draw();
+                this.building.draw();
+                // draw & animate: ground
+                this.ground.draw();
+                if ( this.time.current - this.time.start > 150 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                }
+                this.char.drawIddleL( this.char.animationIddle.stepIddle );
+            }
+            if(direction===1 && (movingL===false && movingR===false && jump === false)){
+                // draw: background
+                this.sky.draw();
+                this.city.draw();
+                this.building.draw();
+                // draw & animate: ground
+                this.ground.draw();
+                if ( this.time.current - this.time.start > 150 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                }
+                this.char.drawIddleR( this.char.animationIddle.stepIddle );
+            }
+            if(direction===1 && jump === true){
+                // draw: background
+                this.sky.update();
+                this.city.update();
+                this.building.update();
+                // draw & animate: ground
+                this.ground.update();
+                if ( this.time.current - this.time.start > 150 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
+                }
+                this.char.drawJumpR( this.char.animationJump.stepJump );
+            }
+
         };
 
         // Game over
@@ -422,6 +863,8 @@
             this.started = false;
             window.cancelAnimationFrame( this.animationRequestID );
             window.alert( "GameOver" );
+            soundEfx.src = soundLoad;
+            soundEfx.play();
 
             if ( window.confirm( "Recommencer ?" ) ) {
                 this.start();
@@ -433,12 +876,19 @@
             // declare click & keyup events
             if ( !this.eventsSetted ) { // we need to be sure to listen to events only once. we use a boolean to do it.
                 // this.app.canvas.addEventListener( "click", this.bird.update.bind( this.bird ) );
-                // window.addEventListener( "keyup", this.bird.update.bind( this.bird ) );
+                // window.addEventListener( "keydown", this.char.update.bind( this.char ) );
+                // window.addEventListener( "keyup", this.char.update.bind( this.char ) );
+                window.addEventListener('keydown',doKeyDown,true);
+                window.addEventListener('keyup',doKeyUp,true);
                 this.eventsSetted = true;
             }
             // reset some variables
             this.char.init();
             this.time.start = Date.now();
+            //launch soundEfx
+            soundEfx.loop = true;;
+            soundEfx.play();
+
             // launch animation
             this.animate();
         };
