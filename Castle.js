@@ -42,7 +42,9 @@
                 movingR=false;
                 break;
             case 32: /* space was pressed */
-
+                if ( !game.started ) {
+                    game.started = true;
+                }
                 break;
             }
     }
@@ -52,9 +54,10 @@
     Castle = function( oApp ) {
 
         var game = this; // eslint-disable-line consistent-this
-        //Assign audio to soundEfx
-        var soundEfx = document.getElementById("soundEfx");
-        var soundLoad = "resources/sounds/GameOver.mp3"; //Game Over sound efx
+        //Assign audio to Music
+        var IntroMusic = document.getElementById("IntroMusic");
+        var GameOverMusic = "resources/sounds/GameOver.wav"; //Game Over sound efx
+        var GameMusic = document.getElementById("GameMusic"); //Game music
 
         this.app = oApp;
 
@@ -62,6 +65,31 @@
             "start": null,
             "current": null
         };
+        // Starting Screen
+       this.starting = {
+           "frame": {
+               "sx": 48,
+               "sy": 195,
+               "sw": 119,
+               "sh": 77,
+               "dx": (game.app.width - 119)/2,
+               "dy": game.app.height/2 - 100,
+               "dw": 119,
+               "dh": 77
+           },
+           "draw": function() {
+               var oContext = game.app.context;
+
+                oContext.drawImage(game.IntroBackgr,0,0,800, 529,0,0, 500, 312);
+
+                game._drawTitleFromFrame( this.frame );
+
+                oContext.font="20px GameFont";
+                oContext.fillStyle="white";
+                oContext.fillText("Press SPACE to play !",(game.app.width-240 ) / 2,game.app.height-80);
+            }
+       };
+
 
         // Background
         this.sky = {
@@ -778,6 +806,19 @@
                 oFrame.dh
             );
         };
+        this._drawTitleFromFrame = function( oFrame ) {
+            this.app.context.drawImage(
+                this.Title,
+                oFrame.sx,
+                oFrame.sy,
+                oFrame.sw,
+                oFrame.sh,
+                oFrame.dx,
+                oFrame.dy,
+                oFrame.dw,
+                oFrame.dh
+            );
+        };
 
 
         // Setup Animation loop
@@ -787,74 +828,85 @@
 
             // draw: clear
             this.app.context.clearRect( 0, 0, this.app.width, this.app.height );
-            if (movingR===true) {
-                // draw & animate: background
-                this.sky.update();
-                this.city.update();
-                this.building.update();
-                // draw & animate: ground
-                this.ground.update();
-                // draw & animate: character
-                if ( this.time.current - this.time.start > 50 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
+            //launch music/animation if game is started
+            if ( game.started ) {
+                //game music
+                IntroMusic.src="";
+                GameMusic.play();
+                //Char movement
+                if (movingR===true) {
+                    // draw & animate: background
+                    this.sky.update();
+                    this.city.update();
+                    this.building.update();
+                    // draw & animate: ground
+                    this.ground.update();
+                    // draw & animate: character
+                    if ( this.time.current - this.time.start > 50 ) {
+                        this.time.start = Date.now();
+                        ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
+                    }
+                    this.char.drawR( this.char.animationR.stepR );
                 }
-                this.char.drawR( this.char.animationR.stepR );
-            }
-            if (movingL===true) {
-                // draw & animate: background
-                this.sky.updateL();
-                this.city.updateL();
-                this.building.updateL();
-                // draw & animate: ground
-                this.ground.updateL();
-                // draw & animate: character
-                // this.char.update();
-                if ( this.time.current - this.time.start > 50 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
+                if (movingL===true) {
+                    // draw & animate: background
+                    this.sky.updateL();
+                    this.city.updateL();
+                    this.building.updateL();
+                    // draw & animate: ground
+                    this.ground.updateL();
+                    // draw & animate: character
+                    // this.char.update();
+                    if ( this.time.current - this.time.start > 50 ) {
+                        this.time.start = Date.now();
+                        ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
+                    }
+                    this.char.drawL( this.char.animationL.stepL );
                 }
-                this.char.drawL( this.char.animationL.stepL );
-            }
-            if(direction===2 && (movingL===false && movingR===false && jump === false)){
-                // draw: background
-                this.sky.draw();
-                this.city.draw();
-                this.building.draw();
-                // draw & animate: ground
-                this.ground.draw();
-                if ( this.time.current - this.time.start > 150 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                if(direction===2 && (movingL===false && movingR===false && jump === false)){
+                    // draw: background
+                    this.sky.draw();
+                    this.city.draw();
+                    this.building.draw();
+                    // draw & animate: ground
+                    this.ground.draw();
+                    if ( this.time.current - this.time.start > 150 ) {
+                        this.time.start = Date.now();
+                        ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                    }
+                    this.char.drawIddleL( this.char.animationIddle.stepIddle );
                 }
-                this.char.drawIddleL( this.char.animationIddle.stepIddle );
-            }
-            if(direction===1 && (movingL===false && movingR===false && jump === false)){
-                // draw: background
-                this.sky.draw();
-                this.city.draw();
-                this.building.draw();
-                // draw & animate: ground
-                this.ground.draw();
-                if ( this.time.current - this.time.start > 150 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                if(direction===1 && (movingL===false && movingR===false && jump === false)){
+                    // draw: background
+                    this.sky.draw();
+                    this.city.draw();
+                    this.building.draw();
+                    // draw & animate: ground
+                    this.ground.draw();
+                    if ( this.time.current - this.time.start > 150 ) {
+                        this.time.start = Date.now();
+                        ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                    }
+                    this.char.drawIddleR( this.char.animationIddle.stepIddle );
                 }
-                this.char.drawIddleR( this.char.animationIddle.stepIddle );
-            }
-            if(direction===1 && jump === true){
-                // draw: background
-                this.sky.update();
-                this.city.update();
-                this.building.update();
-                // draw & animate: ground
-                this.ground.update();
-                if ( this.time.current - this.time.start > 150 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
+                if(direction===1 && jump === true){
+                    // draw: background
+                    this.sky.update();
+                    this.city.update();
+                    this.building.update();
+                    // draw & animate: ground
+                    this.ground.update();
+                    if ( this.time.current - this.time.start > 150 ) {
+                        this.time.start = Date.now();
+                        ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
+                    }
+                    this.char.drawJumpR( this.char.animationJump.stepJump );
                 }
-                this.char.drawJumpR( this.char.animationJump.stepJump );
+
+            }else{
+                this.starting.draw();
             }
+
 
         };
 
@@ -863,8 +915,7 @@
             this.started = false;
             window.cancelAnimationFrame( this.animationRequestID );
             window.alert( "GameOver" );
-            soundEfx.src = soundLoad;
-            soundEfx.play();
+
 
             if ( window.confirm( "Recommencer ?" ) ) {
                 this.start();
@@ -875,21 +926,23 @@
         this.start = function() {
             // declare click & keyup events
             if ( !this.eventsSetted ) { // we need to be sure to listen to events only once. we use a boolean to do it.
-                // this.app.canvas.addEventListener( "click", this.bird.update.bind( this.bird ) );
-                // window.addEventListener( "keydown", this.char.update.bind( this.char ) );
-                // window.addEventListener( "keyup", this.char.update.bind( this.char ) );
                 window.addEventListener('keydown',doKeyDown,true);
                 window.addEventListener('keyup',doKeyUp,true);
                 this.eventsSetted = true;
             }
             // reset some variables
+            this.started = false;
+            this.ended = false;
             this.char.init();
             this.time.start = Date.now();
-            //launch soundEfx
-            soundEfx.loop = true;;
-            soundEfx.play();
+
+            //launch Music
+            if (!game.started) {
+                IntroMusic.play();
+            }
 
             // launch animation
+
             this.animate();
         };
 
@@ -900,6 +953,12 @@
         this.CharacterSprite = new Image();
         this.CharacterSprite.addEventListener( "load", this.start.bind( this ) );
         this.CharacterSprite.src = "./resources/spritesChar.png";
+        this.Title = new Image();
+        this.Title.addEventListener( "load", this.start.bind( this ) );
+        this.Title.src = "./resources/title.png";
+        this.IntroBackgr = new Image();
+        this.IntroBackgr.addEventListener( "load", this.start.bind( this ) );
+        this.IntroBackgr.src = "./resources/Intro.jpg";
     };
 
     window.Castle = Castle;

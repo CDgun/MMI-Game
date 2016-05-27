@@ -31,13 +31,23 @@
             ::selection {
                 background: transparent;
             }
+
+            @font-face {
+                font-family: 'GameFont';
+                src: url('./resources/fonts/half_bold_pixel-7-webfont.woff2') format('woff2'),
+                     url('./resources/fonts/half_bold_pixel-7-webfont.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+
+            }
         </style>
     </head>
     <body>
         <h1>Castle</h1>
 
         <canvas id="game" width="500" height="312"></canvas>
-        <audio id="soundEfx" src="resources/sounds/BloodyTears.wav" style="display: none;"></audio>
+        <audio id="IntroMusic" src="resources/sounds/BlueMoon.wav" style="display: none;"loop></audio>
+        <audio id="GameMusic" src="resources/sounds/BloodyTears.wav" style="display: none;"loop></audio>
         <script src="Castle.js"></script>
         <script src="game.js"></script>
     </body>
