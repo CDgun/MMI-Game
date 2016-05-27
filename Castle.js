@@ -220,6 +220,144 @@
             }
         };
 
+        //zombie
+        this.zombie ={
+            "framesZ":[
+                {
+                    "sx": 22,
+                    "sy": 3,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 48,
+                    "sy": 3,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 75,
+                    "sy": 3,
+                    "sw": 23,
+                    "sh": 47
+                },
+                {
+                    "sx": 101,
+                    "sy": 3,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 36,
+                    "sy": 112,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 63,
+                    "sy": 112,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 90,
+                    "sy": 112,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 120,
+                    "sy": 57,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 90,
+                    "sy": 57,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 62,
+                    "sy": 57,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 38,
+                    "sy": 57,
+                    "sw": 23,
+                    "sh": 47
+
+                },
+                {
+                    "sx": 14,
+                    "sy": 57,
+                    "sw": 23,
+                    "sh": 47
+
+                }
+            ],
+            "init": function() {
+                // (re)setting properties
+                this.animation = {
+                    "maxSteps": this.framesZ.length,
+                    "step": 0
+                };
+                this.state = {
+                    "isInDangerZone": false,
+                    "speed": 0
+                };
+                this.destinationFrameZ = {
+                    "dx": game.app.width-23,
+                    "dy": game.app.height -36,
+                    "dw": 23,
+                    "dh": 47
+                };
+            },
+            "drawZombie":function ( iStep ) {
+                var oContext = game.app.context,
+                    oFrom = this.framesZ[ iStep ],
+                    oDest = this.destinationFrameZ;
+
+                oContext.save();
+                oContext.translate( oDest.dx, oDest.dy );
+                oContext.drawImage(
+                    game.zombieSprite,
+                    oFrom.sx,
+                    oFrom.sy,
+                    oFrom.sw,
+                    oFrom.sh,
+                    oDest.dw / 2 * -1,
+                    oDest.dh / 2 * -1,
+                    oDest.dw,
+                    oDest.dh
+                );
+                oContext.restore();
+            },
+            "update": function() {
+                this.framesZ.dx -= game.ground.speed;
+                if ( this.framesZ.dx < ( this.framesZ.dw * -1 ) ) {
+                    this.framesZ.dx = game.app.width;
+                }
+                //zombie
+                if ( game.time.current - game.time.start > 100 ) {
+                    game.time.start = Date.now();
+                    ( ++game.zombie.animation.step < game.zombie.animation.maxSteps ) || ( game.zombie.animation.step = 0 );
+                }
+                game.zombie.drawZombie(game.zombie.animation.step);
+
+            }
+        };
         // character
 
         this.char = {
@@ -603,12 +741,6 @@
                         this.state = {
                             "isInDangerZone": false,
                             "speed": 0,
-                            "acceleration": 0,
-                            "boost": 0
-                        };
-                        this.position = {
-                            "top": 0,
-                            "bottom": 0
                         };
                         this.destinationFrameR = {
                             "dx": game.app.width / 2,
@@ -833,6 +965,8 @@
                 //game music
                 IntroMusic.src="";
                 GameMusic.play();
+
+
                 //Char movement
                 if (movingR===true) {
                     // draw & animate: background
@@ -847,6 +981,7 @@
                         ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
                     }
                     this.char.drawR( this.char.animationR.stepR );
+
                 }
                 if (movingL===true) {
                     // draw & animate: background
@@ -862,6 +997,7 @@
                         ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
                     }
                     this.char.drawL( this.char.animationL.stepL );
+
                 }
                 if(direction===2 && (movingL===false && movingR===false && jump === false)){
                     // draw: background
@@ -875,6 +1011,7 @@
                         ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
                     }
                     this.char.drawIddleL( this.char.animationIddle.stepIddle );
+
                 }
                 if(direction===1 && (movingL===false && movingR===false && jump === false)){
                     // draw: background
@@ -888,20 +1025,23 @@
                         ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
                     }
                     this.char.drawIddleR( this.char.animationIddle.stepIddle );
+
                 }
-                if(direction===1 && jump === true){
-                    // draw: background
-                    this.sky.update();
-                    this.city.update();
-                    this.building.update();
-                    // draw & animate: ground
-                    this.ground.update();
-                    if ( this.time.current - this.time.start > 150 ) {
-                        this.time.start = Date.now();
-                        ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
-                    }
-                    this.char.drawJumpR( this.char.animationJump.stepJump );
-                }
+                // if(direction===1 && jump === true){
+                //     // draw: background
+                //     this.sky.update();
+                //     this.city.update();
+                //     this.building.update();
+                //     // draw & animate: ground
+                //     this.ground.update();
+                //     if ( this.time.current - this.time.start > 150 ) {
+                //         this.time.start = Date.now();
+                //         ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
+                //     }
+                //     this.char.drawJumpR( this.char.animationJump.stepJump );
+                // }
+
+
 
             }else{
                 this.starting.draw();
@@ -934,6 +1074,7 @@
             this.started = false;
             this.ended = false;
             this.char.init();
+            this.zombie.init();
             this.time.start = Date.now();
 
             //launch Music
@@ -955,7 +1096,10 @@
         this.CharacterSprite.src = "./resources/spritesChar.png";
         this.Title = new Image();
         this.Title.addEventListener( "load", this.start.bind( this ) );
-        this.Title.src = "./resources/title.png";
+        this.Title.src = "./resources/Title.png";
+        this.zombieSprite = new Image();
+        this.zombieSprite.addEventListener( "load", this.start.bind( this ) );
+        this.zombieSprite.src = "./resources/zombie.png";
         this.IntroBackgr = new Image();
         this.IntroBackgr.addEventListener( "load", this.start.bind( this ) );
         this.IntroBackgr.src = "./resources/Intro.jpg";
