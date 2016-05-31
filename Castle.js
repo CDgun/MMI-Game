@@ -28,7 +28,11 @@
                 break;
             case 32: /* space was pressed */
                 if ( game.started ) {
+                    gunshot.pause();
+                    gunshot.currentTime = 0.0;
+                    gunshot.volume = 0.3;
                     atk = true;
+
                 }
                 break;
             }
@@ -258,7 +262,7 @@
                 "dw": 2020,
                 "dh": 192
             },
-            "speed": 1.2,
+            "speed": 1,
             "maxOffset": 2020- game.app.width,
             "draw": function() {
                 game._drawBackgrSpriteFromFrame( this.frame );
@@ -292,7 +296,7 @@
                 "dw": 2028,
                 "dh": 15
             },
-            "speed": 1.2,
+            "speed": 1,
             "maxOffset": 2028 - game.app.width,
             "draw": function() {
                 game._drawBackgrSpriteFromFrame( this.frame );
@@ -783,27 +787,218 @@
                     ],
                     "framesDown":[],
                     "framesAtk":[
-                        {
-                            "sx": 47,
-                            "sy": 1417,
-                            "sw": 34,
-                            "sh": 44,
-                            "dw": 34
-                        },
-                        {
-                            "sx": 87,
+                        { // holster out
+                            "sx": 551,
                             "sy": 1417,
                             "sw": 45,
-                            "sh": 44,
-                            "dw": 45
+                            "sh": 44
                         },
                         {
-                            "sx": 138,
+                            "sx": 494,
                             "sy": 1417,
-                            "sw": 31,
-                            "sh": 44,
-                            "dw": 31
+                            "sw": 45,
+                            "sh": 44
+
+                        },
+                        {
+                            "sx": 443,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 395,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 345,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 291,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        { //shoot
+                            "sx": 7,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 63,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 114,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 180,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 233,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        { // holster in
+                            "sx": 291,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 345,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+
+                        },
+                        {
+                            "sx": 395,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 443,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 494,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 551,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
                         }
+
+                    ],
+                    "framesAtkL":[
+                        { // holster out
+                            "sx": 773,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 830,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+
+                        },
+                        {
+                            "sx": 881,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 929,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 979,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 1033,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        { //shoot
+                            "sx": 1317,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 1261,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 1210,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 1144,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 1091,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        { // holster in
+                            "sx": 1033,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 979,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+
+                        },
+                        {
+                            "sx": 929,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 881,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 830,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        },
+                        {
+                            "sx": 773,
+                            "sy": 1417,
+                            "sw": 45,
+                            "sh": 44
+                        }
+
                     ],
                     "init": function() {
                         // (re)setting properties
@@ -859,8 +1054,15 @@
                         //     "dh": 42
                         // };
                         this.destinationFrameAtk = {
-                            "dx":game.app.width / 2,
+                            "dx":(game.app.width + 36) / 2,
                             "dy": game.app.height -36,
+                            "dw": 45,
+                            "dh": 44
+                        };
+                        this.destinationFrameAtkL = {
+                            "dx":(game.app.width -36) / 2,
+                            "dy": game.app.height -36,
+                            "dw": 45,
                             "dh": 44
                         };
                     },
@@ -968,6 +1170,26 @@
                         var oContext = game.app.context,
                             oFrom = this.framesAtk[ iStep ],
                             oDest = this.destinationFrameAtk;
+
+                        oContext.save();
+                        oContext.translate( oDest.dx, oDest.dy );
+                        oContext.drawImage(
+                            game.CharacterSprite,
+                            oFrom.sx,
+                            oFrom.sy,
+                            oFrom.sw,
+                            oFrom.sh,
+                            oDest.dw / 2 * -1,
+                            oDest.dh / 2 * -1,
+                            oDest.dw,
+                            oDest.dh
+                        );
+                        oContext.restore();
+                    },
+                    "drawAtkL":function ( iStep ) {
+                        var oContext = game.app.context,
+                            oFrom = this.framesAtkL[ iStep ],
+                            oDest = this.destinationFrameAtkL;
 
                         oContext.save();
                         oContext.translate( oDest.dx, oDest.dy );
@@ -1099,7 +1321,7 @@
             }
 
             //Char movement
-            if (movingR===true) {
+            if (movingR && !atk) {
                 // draw & animate: background
                 this.sky.update();
                 this.city.update();
@@ -1114,7 +1336,7 @@
                 this.char.drawR( this.char.animationR.stepR );
 
             }
-            if (movingL===true) {
+            if (movingL && !atk) {
                 // draw & animate: background
                 this.sky.updateL();
                 this.city.updateL();
@@ -1130,7 +1352,7 @@
                 this.char.drawL( this.char.animationL.stepL );
 
             }
-            if(direction===2 && (movingL===false && movingR===false && jump === false)){
+            if(direction===2 && !atk && ( !movingL && !movingR && !jump ) ){
                 // draw: background
                 this.sky.draw();
                 this.city.draw();
@@ -1144,7 +1366,7 @@
                 this.char.drawIddleL( this.char.animationIddle.stepIddle );
 
             }
-            if(direction===1 && (movingL===false && movingR===false && jump === false)){
+            if(direction===1 && !atk && ( !movingL && !movingR && !jump ) ){
                 // draw: background
                 this.sky.draw();
                 this.city.draw();
@@ -1156,7 +1378,46 @@
                     ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
                 }
                 this.char.drawIddleR( this.char.animationIddle.stepIddle );
-
+            }
+            if(direction===1 && atk){
+                // draw: background
+                this.sky.draw();
+                this.city.draw();
+                this.building.draw();
+                // draw: ground
+                this.ground.draw();
+                if ( this.time.current - this.time.start > 70 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationAtk.stepAtk < this.char.animationAtk.maxStepsAtk );
+                }
+                this.char.drawAtk( this.char.animationAtk.stepAtk );
+                if (this.char.animationAtk.stepAtk === (this.char.animationAtk.maxStepsAtk-1)) {
+                    atk = false;
+                    this.char.animationAtk.stepAtk=0;
+                }
+                if (this.char.animationAtk.stepAtk === 8) {
+                    gunshot.play();
+                }
+            }
+            if(direction===2 && atk){
+                // draw: background
+                this.sky.draw();
+                this.city.draw();
+                this.building.draw();
+                // draw: ground
+                this.ground.draw();
+                if ( this.time.current - this.time.start > 70 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationAtk.stepAtk < this.char.animationAtk.maxStepsAtk );
+                }
+                this.char.drawAtkL( this.char.animationAtk.stepAtk );
+                if (this.char.animationAtk.stepAtk === (this.char.animationAtk.maxStepsAtk-1)) {
+                    atk = false;
+                    this.char.animationAtk.stepAtk=0;
+                }
+                if (this.char.animationAtk.stepAtk === 8) {
+                    gunshot.play();
+                }
             }
             // if(direction===1 && jump === true){
             //     // draw: background
@@ -1214,6 +1475,11 @@
             this.IntroMusic = document.getElementById("IntroMusic");
             this.GameOverMusic = document.getElementById("GameOverMusic");; //Game Over sound efx
             this.GameMusic = document.getElementById("GameMusic"); //Game music
+
+            // sound efx
+
+            this.gunshot = document.getElementById("gunshot"); //gunshot
+
             // reset some variables
             this.hp = 10;
             this.started = false;
