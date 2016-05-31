@@ -19,12 +19,20 @@
 
                 break;
             case 37:  /* Left arrow was pressed */
-                movingL=true;
-                direction = 2;
+                if ( game.started ) {
+                    if(!atk){
+                        movingL=true;
+                        direction = 2;
+                    }
+                }
                 break;
             case 39:  /* Right arrow was pressed */
-                movingR=true;
-                direction = 1;
+                if ( game.started ) {
+                    if(!atk){
+                        movingR=true;
+                        direction = 1;
+                    }
+                }
                 break;
             case 32: /* space was pressed */
                 if ( game.started ) {
@@ -71,6 +79,10 @@
         this.time = {
             "start": null,
             "current": null
+        };
+        this.timeZombie = {
+            "start": null,
+            "current": null,
         };
         // Starting Screen
         this.starting = {
@@ -405,6 +417,7 @@
             ],
             "init": function() {
                 // (re)setting properties
+
                 this.animation = {
                     "maxSteps": this.framesZ.length,
                     "step": 0
@@ -414,7 +427,7 @@
                     "speed": 0
                 };
                 this.destinationFrameZ = {
-                    "dx": game.app.width-23,
+                    "dx": 530,
                     "dy": game.app.height -36,
                     "dw": 23,
                     "dh": 47
@@ -441,16 +454,22 @@
                 oContext.restore();
             },
             "update": function() {
-                this.framesZ.dx -= game.ground.speed;
-                if ( this.framesZ.dx < ( this.framesZ.dw * -1 ) ) {
-                    this.framesZ.dx = game.app.width;
+                this.destinationFrameZ.dx-=0.03;
+                if (movingR===true && !atk) {
+                    this.destinationFrameZ.dx-=0.7;
+                }
+                if (movingL===true && !atk) {
+                    this.destinationFrameZ.dx+=0.7;
                 }
                 //zombie
-                if ( game.time.current - game.time.start > 100 ) {
-                    game.time.start = Date.now();
+                if ( game.timeZombie.current - game.timeZombie.start > 100 ) {
+                    game.timeZombie.start = Date.now();
                     ( ++game.zombie.animation.step < game.zombie.animation.maxSteps ) || ( game.zombie.animation.step = 0 );
                 }
                 game.zombie.drawZombie(game.zombie.animation.step);
+
+                        // console.log(game.zombie.destinationFrameZ.dx);
+
 
             }
         };
@@ -1145,26 +1164,6 @@
                         );
                         oContext.restore();
                     },
-                    // "drawJumpR":function ( iStep ) {
-                    //     var oContext = game.app.context,
-                    //         oFrom = this.framesJumpR[ iStep ],
-                    //         oDest = this.destinationFrameJump;
-                    //
-                    //     oContext.save();
-                    //     oContext.translate( oDest.dx, oDest.dy );
-                    //     oContext.drawImage(
-                    //         game.CharacterSprite,
-                    //         oFrom.sx,
-                    //         oFrom.sy,
-                    //         oFrom.sw,
-                    //         oFrom.sh,
-                    //         oDest.dw / 2 * -1,
-                    //         oDest.dh / 2 * -1,
-                    //         oDest.dw,
-                    //         oDest.dh
-                    //     );
-                    //     oContext.restore();
-                    // },
                     "drawAtk":function ( iStep ) {
                         var oContext = game.app.context,
                             oFrom = this.framesAtk[ iStep ],
@@ -1204,24 +1203,79 @@
                             oDest.dh
                         );
                         oContext.restore();
+                    },
+                    "update": function( oEvent ) {
+                        //Char movement
+                        if (movingR && !atk) {
+                            // draw & animate: character
+                            if ( game.time.current - game.time.start > 50 ) {
+                                game.time.start = Date.now();
+                                ( ++game.char.animationR.stepR < game.char.animationR.maxStepsR ) || ( game.char.animationR.stepR = 0 );
+                            }
+                            game.char.drawR( game.char.animationR.stepR );
+
+                        }
+                        if (movingL && !atk) {
+                            // draw & animate: character
+                            if ( game.time.current - game.time.start > 50 ) {
+                                game.time.start = Date.now();
+                                ( ++game.char.animationL.stepL < game.char.animationL.maxStepsL ) || ( game.char.animationL.stepL = 0 );
+                            }
+                            game.char.drawL( game.char.animationL.stepL );
+
+                        }
+                        if(direction===2 && !atk && ( !movingL && !movingR && !jump ) ){
+                            if ( game.time.current - game.time.start > 150 ) {
+                                game.time.start = Date.now();
+                                ( ++game.char.animationIddle.stepIddle < game.char.animationIddle.maxStepIddle ) || ( game.char.animationIddle.stepIddle = 0 );
+                            }
+                            game.char.drawIddleL( game.char.animationIddle.stepIddle );
+
+                        }
+                        if(direction===1 && !atk && ( !movingL && !movingR && !jump ) ){
+                            if ( game.time.current - game.time.start > 150 ) {
+                                game.time.start = Date.now();
+                                ( ++game.char.animationIddle.stepIddle < game.char.animationIddle.maxStepIddle ) || ( game.char.animationIddle.stepIddle = 0 );
+                            }
+                            game.char.drawIddleR( game.char.animationIddle.stepIddle );
+                        }
+                        if(direction===1 && atk){
+                            if ( game.time.current - game.time.start > 70 ) {
+                                game.time.start = Date.now();
+                                ( ++game.char.animationAtk.stepAtk < game.char.animationAtk.maxStepsAtk );
+                            }
+                            game.char.drawAtk( game.char.animationAtk.stepAtk );
+                            if (game.char.animationAtk.stepAtk === (game.char.animationAtk.maxStepsAtk-1)) {
+                                atk = false;
+                                game.char.animationAtk.stepAtk=0;
+                            }
+                            if (game.char.animationAtk.stepAtk === 8) {
+                                gunshot.play();
+                            }
+                        }
+                        if(direction===2 && atk){
+                            if ( game.time.current - game.time.start > 70 ) {
+                                game.time.start = Date.now();
+                                ( ++game.char.animationAtk.stepAtk < game.char.animationAtk.maxStepsAtk );
+                            }
+                            game.char.drawAtkL( game.char.animationAtk.stepAtk );
+                            if (game.char.animationAtk.stepAtk === (game.char.animationAtk.maxStepsAtk-1)) {
+                                atk = false;
+                                game.char.animationAtk.stepAtk=0;
+                                gunshot.pause();
+                                gunshot.currentTime = 0.0;
+                            }
+                            if (game.char.animationAtk.stepAtk === 8) {
+                                gunshot.play();
+                            }
+                        }
+                        //hitzones
+
+                        if (((game.char.destinationFrameR.dx||game.char.destinationFrameAtk.dx||game.char.destinationFrameL.dx||game.char.destinationFrameIddle.dx)+26) > game.zombie.destinationFrameZ.dx ){
+                            game.hp-=1;
+                        }
+
                     }
-                    // "update": function( oEvent ) {
-                    //     var self = this;
-                    //
-                    //     // handle event. we ensure that the sended event is the good one.
-                    //     // if ( oEvent ) {
-                    //     //     if ( ( oEvent.type === "keydown" && oEvent.keyCode === 68 ) || ( oEvent.type === "keydown" && oEvent.keyCode === 39 ) ) {
-                    //     //         game.char.animation.movingR=true;
-                    //     //     } else {
-                    //     //         return;
-                    //     //     }
-                    //     // }else if ( ( oEvent.type === "keyup" && oEvent.keyCode === 68 ) || ( oEvent.type === "keyup" && oEvent.keyCode === 39 ) ) {
-                    //     //     game.char.animation.movingR=false;
-                    //     // } else {
-                    //     //     return;
-                    //     // }
-                    //
-                    // }
                 };
 
         // Utils
@@ -1301,9 +1355,12 @@
         };
 
 
+
+
         // Setup Animation loop
         this.animate = function() {
             this.time.current = Date.now();
+            this.timeZombie.current = Date.now();
             this.animationRequestID = window.requestAnimationFrame( this.animate.bind( this ) );
 
             // draw: clear
@@ -1317,113 +1374,40 @@
                 //game music
                 GameMusic.play();
                 GameMusic.volume = 0.2;
-            }
-
-            //Char movement
-            if (movingR && !atk) {
-                // draw & animate: background
-                this.sky.update();
-                this.city.update();
-                this.building.update();
-                // draw & animate: ground
-                this.ground.update();
-                // draw & animate: character
-                if ( this.time.current - this.time.start > 50 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
+                if( !movingL && !movingR && !jump ){
+                    // draw: background
+                    this.sky.draw();
+                    this.city.draw();
+                    this.building.draw();
+                    // draw & animate: ground
+                    this.ground.draw();
                 }
-                this.char.drawR( this.char.animationR.stepR );
-
-            }
-            if (movingL && !atk) {
-                // draw & animate: background
-                this.sky.updateL();
-                this.city.updateL();
-                this.building.updateL();
-                // draw & animate: ground
-                this.ground.updateL();
-                // draw & animate: character
-                // this.char.update();
-                if ( this.time.current - this.time.start > 50 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
+                if (movingR && !atk) {
+                    // draw & animate: background
+                    this.sky.update();
+                    this.city.update();
+                    this.building.update();
+                    // draw & animate: ground
+                    this.ground.update();
                 }
-                this.char.drawL( this.char.animationL.stepL );
-
-            }
-            if(direction===2 && !atk && ( !movingL && !movingR && !jump ) ){
-                // draw: background
-                this.sky.draw();
-                this.city.draw();
-                this.building.draw();
-                // draw & animate: ground
-                this.ground.draw();
-                if ( this.time.current - this.time.start > 150 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
+                if (movingL && !atk) {
+                    // draw & animate: background
+                    this.sky.updateL();
+                    this.city.updateL();
+                    this.building.updateL();
+                    // draw & animate: ground
+                    this.ground.updateL();
                 }
-                this.char.drawIddleL( this.char.animationIddle.stepIddle );
+                //draw: char
+                this.char.update();
+
+                //draw hud
+                this.hud.draw();
+                this.enemy();
+
 
             }
-            if(direction===1 && !atk && ( !movingL && !movingR && !jump ) ){
-                // draw: background
-                this.sky.draw();
-                this.city.draw();
-                this.building.draw();
-                // draw & animate: ground
-                this.ground.draw();
-                if ( this.time.current - this.time.start > 150 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
-                }
-                this.char.drawIddleR( this.char.animationIddle.stepIddle );
-            }
-            if(direction===1 && atk){
-                // draw: background
-                this.sky.draw();
-                this.city.draw();
-                this.building.draw();
-                // draw: ground
-                this.ground.draw();
-                if ( this.time.current - this.time.start > 70 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationAtk.stepAtk < this.char.animationAtk.maxStepsAtk );
-                }
-                this.char.drawAtk( this.char.animationAtk.stepAtk );
-                if (this.char.animationAtk.stepAtk === (this.char.animationAtk.maxStepsAtk-1)) {
-                    atk = false;
-                    this.char.animationAtk.stepAtk=0;
-                }
-                if (this.char.animationAtk.stepAtk === 8) {
-                    gunshot.play();
-                }
-            }
-            if(direction===2 && atk){
-                // draw: background
-                this.sky.draw();
-                this.city.draw();
-                this.building.draw();
-                // draw: ground
-                this.ground.draw();
-                if ( this.time.current - this.time.start > 70 ) {
-                    this.time.start = Date.now();
-                    ( ++this.char.animationAtk.stepAtk < this.char.animationAtk.maxStepsAtk );
-                }
-                this.char.drawAtkL( this.char.animationAtk.stepAtk );
-                if (this.char.animationAtk.stepAtk === (this.char.animationAtk.maxStepsAtk-1)) {
-                    atk = false;
-                    this.char.animationAtk.stepAtk=0;
-                    gunshot.pause();
-                    gunshot.currentTime = 0.0;
-                }
-                if (this.char.animationAtk.stepAtk === 8) {
-                    gunshot.play();
-                }
-            }
-        
 
-            //draw hud
-            this.hud.draw();
             if (game.hp === 0){
                 game.over();
             }
@@ -1433,7 +1417,10 @@
 
 
         };
-
+        // generate Enemy
+        this.enemy = function() {
+                game.zombie.update();
+        }
         // Game over
         this.over = function() {
             this.started = false;
@@ -1492,6 +1479,7 @@
 
             this.animate();
         };
+
 
         // Load spritesheet
         this.BackGroundSprite = new Image();
