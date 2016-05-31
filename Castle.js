@@ -1272,11 +1272,21 @@
                         //hitzones
 
                         if (((game.char.destinationFrameR.dx||game.char.destinationFrameAtk.dx||game.char.destinationFrameL.dx||game.char.destinationFrameIddle.dx)+26) > game.zombie.destinationFrameZ.dx ){
-                            game.hp-=1;
+                            game.hp= game.hp-1;
+                            for (var i = 0; i < 50; i++) {
+                                game.zombie.destinationFrameZ.dx+=1;
+                                game.sky.updateL();
+                                game.city.updateL();
+                                game.building.updateL();
+                                // draw & animate: ground
+                                game.ground.updateL();
+                            }
+
                         }
 
                     }
                 };
+            
 
         // Utils
         this._drawBackgrSpriteFromFrame = function( oFrame ) {
