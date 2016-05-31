@@ -12,7 +12,7 @@
             }
 
             h1 {
-                font-family: 'Fira Sans';
+                font-family: 'GameFont';
                 letter-spacing: 4px;
                 color: red;
                 text-align: center;
@@ -27,6 +27,26 @@
                 box-shadow: 0 0 20px 0 rgba( 0, 0, 0, 0.4 );
                 background: #49373a;
             }
+            .controls {
+                color: white;
+                padding-top: 1em;
+                text-align: center;
+                display: block;
+                font-family: "GameFont";
+            }
+            .controls__elt{
+                text-decoration: none;
+                list-style-type: none;
+                text-align: left;
+                width: 20em;
+                margin: 0 auto;
+
+            }
+
+            canvas {
+                margin: 0 auto;
+            }
+
 
             ::selection {
                 background: transparent;
@@ -46,8 +66,16 @@
         <h1>Castle</h1>
 
         <canvas id="game" width="500" height="312"></canvas>
+        <section class = "controls">
+            <h2>controls:</h2>
+            <ul>
+                <li class = "controls__elt">left arrow : move left</li>
+                <li class = "controls__elt">right arrow : move right</li>
+            </ul>
+        </section>
         <audio id="IntroMusic" src="resources/sounds/BlueMoon.wav" style="display: none;"loop></audio>
         <audio id="GameMusic" src="resources/sounds/BloodyTears.wav" style="display: none;"loop></audio>
+        <audio id="GameOverMusic" src="resources/sounds/GameOver.wav" style="display: none;"></audio>
         <script src="Castle.js"></script>
         <script src="game.js"></script>
     </body>

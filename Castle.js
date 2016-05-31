@@ -5,7 +5,9 @@
         direction = 1, // 1 = right, 2 = left
         movingL = false,
         movingR = false,
-        jump = false;
+        jump = false,
+        atk = false
+        ;
 
     // keyboard Manager
     function doKeyDown(evt){
@@ -25,7 +27,9 @@
                 direction = 1;
                 break;
             case 32: /* space was pressed */
-
+                if ( game.started ) {
+                    atk = true;
+                }
                 break;
             }
 
@@ -45,19 +49,19 @@
                 if ( !game.started ) {
                     game.started = true;
                 }
+                if ( game.failed ) {
+                    game.start();
+                }
                 break;
             }
     }
+
 
     // background Manager
 
     Castle = function( oApp ) {
 
         var game = this; // eslint-disable-line consistent-this
-        //Assign audio to Music
-        var IntroMusic = document.getElementById("IntroMusic");
-        var GameOverMusic = "resources/sounds/GameOver.wav"; //Game Over sound efx
-        var GameMusic = document.getElementById("GameMusic"); //Game music
 
         this.app = oApp;
 
@@ -66,7 +70,7 @@
             "current": null
         };
         // Starting Screen
-       this.starting = {
+        this.starting = {
            "frame": {
                "sx": 48,
                "sy": 195,
@@ -88,8 +92,96 @@
                 oContext.fillStyle="white";
                 oContext.fillText("Press SPACE to play !",(game.app.width-240 ) / 2,game.app.height-80);
             }
-       };
+        };
+        //Game over Screen
+        this.overScreen = {
+           "frames": {
+               "back": {
+                   "sx": 7,
+                   "sy": 262,
+                   "sw": 256,
+                   "sh": 192,
+                   "dx": 0,
+                   "dy": 0,
+                   "dw": game.app.width,
+                   "dh": game.app.height
+               },
+               "over": {
+                   "sx": 10,
+                   "sy": 200,
+                   "sw": 119,
+                   "sh": 25,
+                   "dx": (game.app.width - 119)/2,
+                   "dy": (game.app.height- 25)/2 ,
+                   "dw": 119,
+                   "dh": 25
+               }
 
+           },
+           "draw": function() {
+               var oContext = game.app.context;
+
+               game._drawGameoverFromFrame( this.frames.back );
+               game._drawGameoverFromFrame( this.frames.over );
+
+               oContext.font="20px GameFont";
+               oContext.fillStyle="white";
+               oContext.fillText("Press SPACE to restart !",(game.app.width-245 ) / 2,game.app.height-80);
+           }
+        };
+        // Hud
+        this.hud = {
+            "frames": {
+                "hudBcg": {
+                    "sx": 6,
+                    "sy": 5,
+                    "sw": 111,
+                    "sh": 23,
+                    "dx": 20 ,
+                    "dy": 20,
+                    "dw": 111,
+                    "dh": 23
+                },
+                "hp": {
+                    "sx": 32,
+                    "sy": 72,
+                    "sw": 5,
+                    "sh": 3,
+                    "dx": 20 + 30 , // hudbcg.dx + dist for hp
+                    "dy": 20 + 4, // hudBcg.dy + dist hp
+                    "dw": 5,
+                    "dh": 3
+                },
+                "weapon": {
+                    "sx": 149,
+                    "sy": 50,
+                    "sw": 20,
+                    "sh": 20,
+                    "dx": 20 + 125,// hudbcg.dx + dist for weapon
+                    "dy": 20,  // hudBcg.dy
+                    "dw": 20,
+                    "dh": 20
+                }
+            },
+            "livesDx": [],
+            "init": function() {
+                while ( this.frames.hp.dx <= (50 + (6 * game.hp)) ) {
+                    this.livesDx.push( this.frames.hp.dx );
+                    this.frames.hp.dx += 6;
+                }
+            },
+            "draw": function() {
+                var i = 0;
+
+                game._drawHudFromFrame( this.frames.hudBcg );
+                game._drawHudFromFrame( this.frames.weapon );
+                // draw hpbar
+                for (i = 0 ; i < game.hp; i++ ) {
+                   game._drawHudFromFrame( this.frames.hp, this.livesDx[ i ] );
+                }
+
+             }
+        };
 
         // Background
         this.sky = {
@@ -123,6 +215,7 @@
                 this.draw();
             }
         };
+
         this.city = {
             "frame": {
                 "sx": 8,
@@ -951,6 +1044,40 @@
                 oFrame.dh
             );
         };
+        this._drawGameoverFromFrame = function( oFrame ) {
+            this.app.context.drawImage(
+                this.GameOver,
+                oFrame.sx,
+                oFrame.sy,
+                oFrame.sw,
+                oFrame.sh,
+                oFrame.dx,
+                oFrame.dy,
+                oFrame.dw,
+                oFrame.dh
+            );
+        };
+
+        this._drawHudFromFrame = function( oFrame, iNewDx ) {
+            var iDx;
+
+            if ( iNewDx == null ) {
+                iDx = oFrame.dx;
+            } else {
+                iDx = iNewDx;
+            }
+            this.app.context.drawImage(
+                this.Hud,
+                oFrame.sx,
+                oFrame.sy,
+                oFrame.sw,
+                oFrame.sh,
+                iDx,
+                oFrame.dy,
+                oFrame.dw,
+                oFrame.dh
+            );
+        };
 
 
         // Setup Animation loop
@@ -961,89 +1088,96 @@
             // draw: clear
             this.app.context.clearRect( 0, 0, this.app.width, this.app.height );
             //launch music/animation if game is started
-            if ( game.started ) {
+            if (game.started) {
+                //stop IntroMusic
+                // IntroMusic.src="";
+                IntroMusic.pause();
+                IntroMusic.currentTime = 0.0;
                 //game music
-                IntroMusic.src="";
                 GameMusic.play();
+                GameMusic.volume = 0.2;
+            }
 
-
-                //Char movement
-                if (movingR===true) {
-                    // draw & animate: background
-                    this.sky.update();
-                    this.city.update();
-                    this.building.update();
-                    // draw & animate: ground
-                    this.ground.update();
-                    // draw & animate: character
-                    if ( this.time.current - this.time.start > 50 ) {
-                        this.time.start = Date.now();
-                        ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
-                    }
-                    this.char.drawR( this.char.animationR.stepR );
-
+            //Char movement
+            if (movingR===true) {
+                // draw & animate: background
+                this.sky.update();
+                this.city.update();
+                this.building.update();
+                // draw & animate: ground
+                this.ground.update();
+                // draw & animate: character
+                if ( this.time.current - this.time.start > 50 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationR.stepR < this.char.animationR.maxStepsR ) || ( this.char.animationR.stepR = 0 );
                 }
-                if (movingL===true) {
-                    // draw & animate: background
-                    this.sky.updateL();
-                    this.city.updateL();
-                    this.building.updateL();
-                    // draw & animate: ground
-                    this.ground.updateL();
-                    // draw & animate: character
-                    // this.char.update();
-                    if ( this.time.current - this.time.start > 50 ) {
-                        this.time.start = Date.now();
-                        ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
-                    }
-                    this.char.drawL( this.char.animationL.stepL );
+                this.char.drawR( this.char.animationR.stepR );
 
+            }
+            if (movingL===true) {
+                // draw & animate: background
+                this.sky.updateL();
+                this.city.updateL();
+                this.building.updateL();
+                // draw & animate: ground
+                this.ground.updateL();
+                // draw & animate: character
+                // this.char.update();
+                if ( this.time.current - this.time.start > 50 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationL.stepL < this.char.animationL.maxStepsL ) || ( this.char.animationL.stepL = 0 );
                 }
-                if(direction===2 && (movingL===false && movingR===false && jump === false)){
-                    // draw: background
-                    this.sky.draw();
-                    this.city.draw();
-                    this.building.draw();
-                    // draw & animate: ground
-                    this.ground.draw();
-                    if ( this.time.current - this.time.start > 150 ) {
-                        this.time.start = Date.now();
-                        ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
-                    }
-                    this.char.drawIddleL( this.char.animationIddle.stepIddle );
+                this.char.drawL( this.char.animationL.stepL );
 
+            }
+            if(direction===2 && (movingL===false && movingR===false && jump === false)){
+                // draw: background
+                this.sky.draw();
+                this.city.draw();
+                this.building.draw();
+                // draw & animate: ground
+                this.ground.draw();
+                if ( this.time.current - this.time.start > 150 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
                 }
-                if(direction===1 && (movingL===false && movingR===false && jump === false)){
-                    // draw: background
-                    this.sky.draw();
-                    this.city.draw();
-                    this.building.draw();
-                    // draw & animate: ground
-                    this.ground.draw();
-                    if ( this.time.current - this.time.start > 150 ) {
-                        this.time.start = Date.now();
-                        ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
-                    }
-                    this.char.drawIddleR( this.char.animationIddle.stepIddle );
+                this.char.drawIddleL( this.char.animationIddle.stepIddle );
 
+            }
+            if(direction===1 && (movingL===false && movingR===false && jump === false)){
+                // draw: background
+                this.sky.draw();
+                this.city.draw();
+                this.building.draw();
+                // draw & animate: ground
+                this.ground.draw();
+                if ( this.time.current - this.time.start > 150 ) {
+                    this.time.start = Date.now();
+                    ( ++this.char.animationIddle.stepIddle < this.char.animationIddle.maxStepIddle ) || ( this.char.animationIddle.stepIddle = 0 );
                 }
-                // if(direction===1 && jump === true){
-                //     // draw: background
-                //     this.sky.update();
-                //     this.city.update();
-                //     this.building.update();
-                //     // draw & animate: ground
-                //     this.ground.update();
-                //     if ( this.time.current - this.time.start > 150 ) {
-                //         this.time.start = Date.now();
-                //         ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
-                //     }
-                //     this.char.drawJumpR( this.char.animationJump.stepJump );
-                // }
+                this.char.drawIddleR( this.char.animationIddle.stepIddle );
 
+            }
+            // if(direction===1 && jump === true){
+            //     // draw: background
+            //     this.sky.update();
+            //     this.city.update();
+            //     this.building.update();
+            //     // draw & animate: ground
+            //     this.ground.update();
+            //     if ( this.time.current - this.time.start > 150 ) {
+            //         this.time.start = Date.now();
+            //         ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
+            //     }
+            //     this.char.drawJumpR( this.char.animationJump.stepJump );
+            // }
 
-
-            }else{
+            //draw hud
+            this.hud.draw();
+            if (game.hp === 0){
+                game.over();
+            }
+            if ( !game.started && !game.failed) {
                 this.starting.draw();
             }
 
@@ -1053,14 +1187,20 @@
         // Game over
         this.over = function() {
             this.started = false;
+            this.failed =true;
             window.cancelAnimationFrame( this.animationRequestID );
-            window.alert( "GameOver" );
+            // window.alert( "GameOver" );
+            game.overScreen.draw();
+            // stop game music
+            GameMusic.pause();
+            GameMusic.currentTime = 0.0;
+            // launch game over sound
+            GameOverMusic.play();
+            GameOverMusic.volume = 0.5;
 
-
-            if ( window.confirm( "Recommencer ?" ) ) {
-                this.start();
-            }
         };
+
+
 
         // Init game
         this.start = function() {
@@ -1070,16 +1210,27 @@
                 window.addEventListener('keyup',doKeyUp,true);
                 this.eventsSetted = true;
             }
+            //Assign audio to Music
+            this.IntroMusic = document.getElementById("IntroMusic");
+            this.GameOverMusic = document.getElementById("GameOverMusic");; //Game Over sound efx
+            this.GameMusic = document.getElementById("GameMusic"); //Game music
             // reset some variables
+            this.hp = 10;
             this.started = false;
+            this.failed = false;
             this.ended = false;
             this.char.init();
             this.zombie.init();
+            this.hud.init();
             this.time.start = Date.now();
 
             //launch Music
             if (!game.started) {
+                GameOverMusic.pause();
+                GameOverMusic.currentTime = 0.0;
+
                 IntroMusic.play();
+                IntroMusic.volume = 0.5;
             }
 
             // launch animation
@@ -1103,6 +1254,12 @@
         this.IntroBackgr = new Image();
         this.IntroBackgr.addEventListener( "load", this.start.bind( this ) );
         this.IntroBackgr.src = "./resources/Intro.jpg";
+        this.Hud = new Image();
+        this.Hud.addEventListener( "load", this.start.bind( this ) );
+        this.Hud.src = "./resources/hud.png";
+        this.GameOver = new Image();
+        this.GameOver.addEventListener( "load", this.start.bind( this ) );
+        this.GameOver.src = "./resources/GameOver.png";
     };
 
     window.Castle = Castle;
