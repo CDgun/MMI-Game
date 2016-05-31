@@ -28,8 +28,7 @@
                 break;
             case 32: /* space was pressed */
                 if ( game.started ) {
-                    gunshot.pause();
-                    gunshot.currentTime = 0.0;
+
                     gunshot.volume = 0.3;
                     atk = true;
 
@@ -262,7 +261,7 @@
                 "dw": 2020,
                 "dh": 192
             },
-            "speed": 1,
+            "speed": 0.7,
             "maxOffset": 2020- game.app.width,
             "draw": function() {
                 game._drawBackgrSpriteFromFrame( this.frame );
@@ -296,7 +295,7 @@
                 "dw": 2028,
                 "dh": 15
             },
-            "speed": 1,
+            "speed": 0.7,
             "maxOffset": 2028 - game.app.width,
             "draw": function() {
                 game._drawBackgrSpriteFromFrame( this.frame );
@@ -1414,24 +1413,14 @@
                 if (this.char.animationAtk.stepAtk === (this.char.animationAtk.maxStepsAtk-1)) {
                     atk = false;
                     this.char.animationAtk.stepAtk=0;
+                    gunshot.pause();
+                    gunshot.currentTime = 0.0;
                 }
                 if (this.char.animationAtk.stepAtk === 8) {
                     gunshot.play();
                 }
             }
-            // if(direction===1 && jump === true){
-            //     // draw: background
-            //     this.sky.update();
-            //     this.city.update();
-            //     this.building.update();
-            //     // draw & animate: ground
-            //     this.ground.update();
-            //     if ( this.time.current - this.time.start > 150 ) {
-            //         this.time.start = Date.now();
-            //         ( ++this.char.animationJump.stepJump < this.char.animationJump.maxStepJump );
-            //     }
-            //     this.char.drawJumpR( this.char.animationJump.stepJump );
-            // }
+        
 
             //draw hud
             this.hud.draw();
@@ -1449,7 +1438,7 @@
         this.over = function() {
             this.started = false;
             this.failed =true;
-            window.cancelAnimationFrame( this.animationRequestID );
+            // window.cancelAnimationFrame( this.animationRequestID );
             // window.alert( "GameOver" );
             game.overScreen.draw();
             // stop game music
