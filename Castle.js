@@ -6,7 +6,10 @@
         movingL = false,
         movingR = false,
         jump = false,
-        atk = false
+        atk = false,
+        shot=false,
+        enemydead=false,
+        enemyhit=false
         ;
 
     // keyboard Manager
@@ -196,6 +199,48 @@
                 }
 
              }
+        };
+        // score
+        this.scorescreen = {
+            "frames": {
+                "cyphers": {
+                    "sy": 67,
+                    "sw": 6,
+                    "sh": 8,
+                    "sx": {
+                        "0": 46,
+                        "1": 53,
+                        "2": 59,
+                        "3": 66,
+                        "4": 73,
+                        "5": 81,
+                        "6": 87,
+                        "7": 94,
+                        "8": 101,
+                        "9": 108
+                    }
+                }
+            },
+            "drawScore": function( iScore ) {
+                var aScoreParts = ( iScore + "" ).split( "" ),
+                    self = this;
+
+                // drawing score
+                aScoreParts.reverse().forEach( function( sScorePart, iIndex ) {
+                    var iDx = game.app.width / 2 + 91 - self.frames.cyphers.sw;
+
+                    game._drawBulletFromFrame( {
+                        "sx": self.frames.cyphers.sx[ sScorePart ],
+                        "sy": self.frames.cyphers.sy,
+                        "sw": self.frames.cyphers.sw,
+                        "sh": self.frames.cyphers.sh,
+                        "dx": iDx - ( iIndex * ( self.frames.cyphers.sw + 2 ) ),
+                        "dy": 20,
+                        "dw": self.frames.cyphers.sw,
+                        "dh": self.frames.cyphers.sh
+                    } );
+                } );
+            }
         };
 
         // Background
@@ -1251,6 +1296,7 @@
                             }
                             if (game.char.animationAtk.stepAtk === 8) {
                                 gunshot.play();
+                                shot=true;
                             }
                         }
                         if(direction===2 && atk){
@@ -1264,15 +1310,24 @@
                                 game.char.animationAtk.stepAtk=0;
                                 gunshot.pause();
                                 gunshot.currentTime = 0.0;
+
                             }
                             if (game.char.animationAtk.stepAtk === 8) {
                                 gunshot.play();
+                                shot=true;
                             }
+                        }
+                        if(direction===1 && shot && !enemyhit){
+                            game.bullet.update();
+                        }
+                        if(direction===2 && shot && !enemyhit){
+                            game.bullet.updateL();
                         }
                         //hitzones
 
-                        if (((game.char.destinationFrameR.dx||game.char.destinationFrameAtk.dx||game.char.destinationFrameL.dx||game.char.destinationFrameIddle.dx)+26) > game.zombie.destinationFrameZ.dx ){
-                            game.hp= game.hp-1;
+                        if (((game.char.destinationFrameR.dx||game.char.destinationFrameAtk.dx||game.char.destinationFrameL.dx||game.char.destinationFrameIddle.dx)+26) >= game.zombie.destinationFrameZ.dx ){
+                            game.hp = game.hp - game.damage;
+
                             for (var i = 0; i < 50; i++) {
                                 game.zombie.destinationFrameZ.dx+=1;
                                 game.sky.updateL();
@@ -1281,13 +1336,71 @@
                                 // draw & animate: ground
                                 game.ground.updateL();
                             }
-
+                        }
+                        if(shot && ((game.bullet.frame.dx + 11)>=game.zombie.destinationFrameZ.dx)){
+                            game.enemyHp = game.enemyHp - 1;
+                            enemyhit = true;
+                        }
+                        if (enemyhit) {
+                            game.bullet.init();
+                            enemyhit=false;
+                            shot=false;
                         }
 
                     }
-                };
-            
 
+                };
+
+        // bullet
+        this.bullet = {
+            "frame": {
+                    "sx": 154,
+                    "sy": 74,
+                    "sw": 11,
+                    "sh": 4,
+                    "dx": ((game.app.width + 36)/ 2),
+                    "dy": (game.app.height -55),
+                    "dw": 11,
+                    "dh": 4
+            },
+            "frameL": {
+                    "sx": 202,
+                    "sy": 74,
+                    "sw": 11,
+                    "sh": 4,
+                    "dx": (((game.app.width - 36)-11)/ 2),
+                    "dy": (game.app.height -55),
+                    "dw": 11,
+                    "dh": 4
+            },
+            "speed": 2,
+            "maxOffset": game.app.width,
+            "init": function () {
+                this.frame.dx=((game.app.width + 36)/ 2);
+            },
+            "draw": function() {
+                game._drawBulletFromFrame( this.frame );
+            },
+            "drawL": function() {
+                game._drawBulletFromFrame( this.frameL );
+            },
+            "update": function() {
+                if ( this.frame.dx >= this.maxOffset) {
+                    shot=false;
+                    game.bullet.init();
+                }
+                this.frame.dx += this.speed;
+                this.draw();
+            },
+            "updateL": function() {
+                if ( this.frameL.dx <= 0 ) {
+                    shot=false;
+                    this.frameL.dx=(((game.app.width - 36)-11)/ 2);
+                }
+                this.frameL.dx -= this.speed;
+                this.drawL();
+            }
+        };
         // Utils
         this._drawBackgrSpriteFromFrame = function( oFrame ) {
             this.app.context.drawImage(
@@ -1332,6 +1445,19 @@
         this._drawGameoverFromFrame = function( oFrame ) {
             this.app.context.drawImage(
                 this.GameOver,
+                oFrame.sx,
+                oFrame.sy,
+                oFrame.sw,
+                oFrame.sh,
+                oFrame.dx,
+                oFrame.dy,
+                oFrame.dw,
+                oFrame.dh
+            );
+        };
+        this._drawBulletFromFrame = function( oFrame ) {
+            this.app.context.drawImage(
+                this.Hud,
                 oFrame.sx,
                 oFrame.sy,
                 oFrame.sw,
@@ -1413,12 +1539,23 @@
 
                 //draw hud
                 this.hud.draw();
-                this.enemy();
-
+                game.scorescreen.drawScore( game.score );
+                game.zombie.update();
+                if (this.enemyHp <= 0) {
+                    enemydead=true;
+                }
+                if (enemydead) {
+                    game.zombie.init();
+                    this.difficulty = this.difficulty + 5;
+                    this.damage = this.damage + 1;
+                    this.enemyHp = this.difficulty;
+                    this.score = this.score+10;
+                    enemydead=false;
+                }
 
             }
 
-            if (game.hp === 0){
+            if (game.hp <= 0){
                 game.over();
             }
             if ( !game.started && !game.failed) {
@@ -1427,10 +1564,10 @@
 
 
         };
-        // generate Enemy
-        this.enemy = function() {
-                game.zombie.update();
-        }
+
+
+
+
         // Game over
         this.over = function() {
             this.started = false;
@@ -1468,12 +1605,17 @@
 
             // reset some variables
             this.hp = 10;
+            this.enemyHp = 5;
+            this.difficulty=5;
+            this.damage=1;
             this.started = false;
             this.failed = false;
             this.ended = false;
             this.char.init();
+            this.bullet.init();
             this.zombie.init();
             this.hud.init();
+            this.score=0;
             this.time.start = Date.now();
 
             //launch Music
